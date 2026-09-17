@@ -1,0 +1,12 @@
+.DS_Store
+._*
+.godot/
+*.tmp
+*.log
+logs/*
+builds/*
+tools/godot/Godot.app/
+tools/godot/*.zip
+tools/godot/templates/
+local_data/
+*.dmg

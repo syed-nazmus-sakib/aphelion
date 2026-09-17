@@ -1,0 +1,99 @@
+{
+	"events": [
+		{
+			"id": "hydroponics_failure",
+			"title": "Hydroponics Fault",
+			"body": "A nutrient line in the hydroponics bay has dropped pressure. Yields will fall unless the array is rebalanced now.",
+			"day": 7,
+			"choices": [
+				{
+					"label": "Rebalance the array",
+					"description": "Divert energy and materials to restore full growth cycles.",
+					"effects": {"energy": -50.0, "materials": -20.0, "food": 80.0, "morale": 3.0}
+				},
+				{
+					"label": "Run at reduced capacity",
+					"description": "Conserve supplies and accept smaller harvests.",
+					"effects": {"food": -30.0, "morale": -5.0}
+				}
+			]
+		},
+		{
+			"id": "reactor_warning",
+			"title": "Reactor Warning",
+			"body": "Diagnostic sensors flag irregular output in the primary reactor. Engineering requests permission to pull maintenance crews from other shifts.",
+			"day": 14,
+			"choices": [
+				{
+					"label": "Authorize full inspection",
+					"description": "Spend medicine to rotate exhausted crews through sick bay.",
+					"effects": {"energy": 30.0, "medicine": -20.0, "materials": -30.0, "morale": 2.0}
+				},
+				{
+					"label": "Defer maintenance",
+					"description": "Keep current output and log the warning.",
+					"effects": {"readiness": -8.0, "morale": -3.0}
+				}
+			]
+		},
+		{
+			"id": "probe_recovery",
+			"title": "Probe Recovery",
+			"body": "A survey probe returns with intact sensor logs from the next transition corridor. Analysts want time to decode the archive.",
+			"day": 21,
+			"choices": [
+				{
+					"label": "Decode the archive",
+					"description": "Use energy and materials to extract navigation data.",
+					"effects": {"energy": -40.0, "materials": -25.0, "readiness": 10.0},
+					"delayed_effects": {"energy": 60.0, "readiness": 5.0},
+					"delay_days": 5
+				},
+				{
+					"label": "Warehouse the probe",
+					"description": "Store the hardware for later study.",
+					"effects": {"materials": 15.0}
+				}
+			]
+		},
+		{
+			"id": "first_contact",
+			"title": "Unknown Contact",
+			"body": "Long-range sensors hold a hard return on an intercept vector. The contact mirrors every course change the arkship makes.",
+			"day": 28,
+			"sets_pending_combat": true,
+			"choices": [
+				{
+					"label": "Raise shields and hold course",
+					"description": "Prepare the arkship for a hostile encounter.",
+					"effects": {"readiness": 5.0, "energy": -20.0}
+				},
+				{
+					"label": "Attempt open broadcast",
+					"description": "Signal the contact with a peaceful greeting.",
+					"effects": {"morale": -4.0, "readiness": -5.0}
+				}
+			]
+		},
+		{
+			"id": "memorial_service",
+			"title": "Memorial Service",
+			"body": "The crew gathers to honor those lost in the encounter. Names are read, bells are rung, and the arkship sails on.",
+			"requires_flag": "encounter_resolved",
+			"requires_last_result_casualties": true,
+			"day_offset_from_trigger": 3,
+			"choices": [
+				{
+					"label": "Hold the service",
+					"description": "A formal observance restores collective spirit.",
+					"effects": {"morale": 10.0}
+				},
+				{
+					"label": "Private remembrance",
+					"description": "Crews grieve in their own way without ceremony.",
+					"effects": {"morale": 3.0, "energy": 5.0}
+				}
+			]
+		}
+	]
+}

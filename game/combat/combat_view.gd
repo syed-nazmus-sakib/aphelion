@@ -25,8 +25,8 @@ var hud: CanvasLayer = null
 var lbl_status: Label = null
 var lbl_warn: Label = null
 var lbl_hint: Label = null
-var pause_panel: PanelContainer = null
-var end_panel: PanelContainer = null
+var pause_panel: Control = null
+var end_panel: Control = null
 var end_title: Label = null
 var end_body: Label = null
 
@@ -83,14 +83,15 @@ func _build_hud() -> void:
 	pause_panel = _make_center_panel("PAUSED", "Esc to resume · combat time is frozen.")
 	pause_panel.visible = false
 	hud.add_child(pause_panel)
-	end_panel = PanelContainer.new()
-	end_panel.set_anchors_preset(Control.PRESET_CENTER)
-	end_panel.custom_minimum_size = Vector2(560, 0)
-	end_panel.position = Vector2(360, 240)
+	end_panel = CenterContainer.new()
+	end_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	end_panel.visible = false
+	var inner := PanelContainer.new()
+	inner.custom_minimum_size = Vector2(560, 0)
+	end_panel.add_child(inner)
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 12)
-	end_panel.add_child(vb)
+	inner.add_child(vb)
 	end_title = Label.new()
 	end_title.add_theme_font_size_override("font_size", 30)
 	vb.add_child(end_title)
@@ -104,10 +105,11 @@ func _build_hud() -> void:
 	vb.add_child(btn)
 	hud.add_child(end_panel)
 
-func _make_center_panel(title: String, body: String) -> PanelContainer:
+func _make_center_panel(title: String, body: String) -> Control:
+	var wrap := CenterContainer.new()
+	wrap.set_anchors_preset(Control.PRESET_FULL_RECT)
 	var p := PanelContainer.new()
-	p.set_anchors_preset(Control.PRESET_CENTER)
-	p.position = Vector2(440, 300)
+	wrap.add_child(p)
 	var vb := VBoxContainer.new()
 	p.add_child(vb)
 	var t := Label.new()
@@ -117,7 +119,7 @@ func _make_center_panel(title: String, body: String) -> PanelContainer:
 	var b := Label.new()
 	b.text = body
 	vb.add_child(b)
-	return p
+	return wrap
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):

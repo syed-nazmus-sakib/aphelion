@@ -16,7 +16,7 @@ var star_map: StarMap
 var advance_btn: Button
 var repair_btn: Button
 var save_btn: Button
-var history_overlay: PanelContainer
+var history_overlay: Control
 var history_full: Label
 
 const DISTRICTS: Array = [
@@ -143,15 +143,23 @@ func _build() -> void:
 	message_label.add_theme_color_override("font_color", Color(0.6, 0.72, 0.85))
 	bottom.add_child(message_label)
 	# history overlay (hidden)
-	history_overlay = PanelContainer.new()
-	history_overlay.set_anchors_preset(Control.PRESET_CENTER)
-	history_overlay.custom_minimum_size = Vector2(640, 420)
-	history_overlay.position = Vector2(320, 190)
+	history_overlay = Control.new()
+	history_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	history_overlay.visible = false
 	add_child(history_overlay)
+	var hdim := ColorRect.new()
+	hdim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	hdim.color = Color(0, 0, 0, 0.6)
+	history_overlay.add_child(hdim)
+	var hcenter := CenterContainer.new()
+	hcenter.set_anchors_preset(Control.PRESET_FULL_RECT)
+	history_overlay.add_child(hcenter)
+	var hpanel := PanelContainer.new()
+	hpanel.custom_minimum_size = Vector2(640, 420)
+	hcenter.add_child(hpanel)
 	var hvb := VBoxContainer.new()
 	hvb.add_theme_constant_override("separation", 10)
-	history_overlay.add_child(hvb)
+	hpanel.add_child(hvb)
 	var ht := Label.new()
 	ht.text = "FLEET HISTORY"
 	ht.add_theme_font_size_override("font_size", 22)

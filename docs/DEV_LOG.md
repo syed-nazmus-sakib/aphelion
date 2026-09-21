@@ -1,5 +1,10 @@
 # DEV LOG
 
+## v0.1.1 — modal dialogs off-screen (user-reported: stuck on menu)
+- Symptom: NEW MIGRATION dialog rendered cut off at the bottom-right; BEGIN EXODUS unreachable; game appeared frozen on the menu.
+- Root cause: `PRESET_CENTER` + manual `position = Vector2(...)` in `new_migration.gd`, `settings_panel.gd`, `strategy_view.gd` (history), `combat_view.gd` (pause/end). Center preset anchors at 50%, so the offset pushed panels to center+(x,y).
+- Fix: full-rect `CenterContainer` wrappers everywhere; Esc closes New Migration / Settings. Verified headless: all dialog buttons enclosed in the 1280×800 viewport; covered by new `test_menu.gd` assertions.
+
 ## v0.1.0 — first playable vertical slice
 - Env: macOS 27.0 arm64, external `/Volumes/ns_external` (931G, 521G free, writable). Project root `/Volumes/ns_external/game` (pre-existing skeleton adopted, not wiped). Godot `4.7.2.stable.official.ed1daf0bf` via `tools/godot/godot` wrapper verified.
 - Adopted skeleton: core state/date/result, 7 systems, 5 events, interceptor/enemies/waves/projectiles, menu/opening/strategy/event/brief scenes + controller, 3 logic tests. Docs/builds/logs/tools shells already present.

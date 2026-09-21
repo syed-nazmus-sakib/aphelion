@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.1.1] — Modal dialog centering fix
+- Fixed all modal dialogs (New Migration, Settings, Fleet History, combat Pause / end panel) rendering off-screen bottom-right. Cause: `set_anchors_preset(PRESET_CENTER)` followed by a manual `position` offset, which Godot interprets as center + offset. All dialogs now use full-rect `CenterContainer` wrappers. Added Esc-to-close on New Migration / Settings.
+- Extended `test_menu.gd`: asserts BEGIN EXODUS / BACK / CLOSE / RETURN TO FLEET are visible and enclosed by the viewport, and that BEGIN EXODUS emits `start_requested`.
+
 ## [0.1.0] — First playable vertical slice
 
 - Campaign core: `CampaignState` (schema v1), `CampaignDate`, `CombatResult`, deterministic seeds, atomic versioned saves.

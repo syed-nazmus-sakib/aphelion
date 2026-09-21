@@ -15,11 +15,12 @@ func _build() -> void:
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dim.color = Color(0, 0, 0, 0.7)
 	add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(center)
 	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.position = Vector2(430, 230)
 	panel.custom_minimum_size = Vector2(420, 0)
-	add_child(panel)
+	center.add_child(panel)
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 12)
 	panel.add_child(vb)
@@ -54,6 +55,11 @@ func _build() -> void:
 
 func open() -> void:
 	visible = true
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel") and visible:
+		closed.emit()
+		get_viewport().set_input_as_handled()
 
 func _on_volume(v: float) -> void:
 	var db: float = linear_to_db(clampf(v / 100.0, 0.001, 1.0))

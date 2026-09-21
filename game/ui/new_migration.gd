@@ -16,11 +16,12 @@ func _build() -> void:
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dim.color = Color(0, 0, 0, 0.7)
 	add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(center)
 	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.position = Vector2(390, 200)
 	panel.custom_minimum_size = Vector2(500, 0)
-	add_child(panel)
+	center.add_child(panel)
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 12)
 	panel.add_child(vb)
@@ -83,6 +84,11 @@ func open() -> void:
 	difficulty_btn.selected = 0
 	visible = true
 	name_edit.grab_focus()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel") and visible:
+		cancelled.emit()
+		get_viewport().set_input_as_handled()
 
 func _on_start() -> void:
 	var cname: String = name_edit.text.strip_edges()

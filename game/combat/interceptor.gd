@@ -2,7 +2,7 @@ class_name MigrationInterceptor
 extends RefCounted
 
 var position: Vector2 = Vector2(640, 570)
-var health: float = 5.0
+var health: float = 8.0
 var invulnerability: float = 0.0
 var cooldown: float = 0.0
 var boost_charge: float = 1.0
@@ -25,5 +25,5 @@ func hit() -> bool:
 	if invulnerability > 0.0 or health <= 0.0:
 		return false
 	health -= 1.0
-	invulnerability = 1.2
+	invulnerability = 1.5
 	return true

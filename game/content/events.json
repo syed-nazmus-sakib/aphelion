@@ -7,14 +7,19 @@
 			"day": 7,
 			"choices": [
 				{
-					"label": "Rebalance the array",
-					"description": "Divert energy and materials to restore full growth cycles.",
+					"label": "Emergency sterilization",
+					"description": "Divert energy and materials to restore full growth cycles fast.",
 					"effects": {"energy": -50.0, "materials": -20.0, "food": 80.0, "morale": 3.0}
 				},
 				{
-					"label": "Run at reduced capacity",
-					"description": "Conserve supplies and accept smaller harvests.",
+					"label": "Ration food",
+					"description": "Preserve energy. Lose morale as mess halls tighten belts.",
 					"effects": {"food": -30.0, "morale": -5.0}
+				},
+				{
+					"label": "Redirect research facilities",
+					"description": "Lose readiness while labs culture replacement crops. Smaller food loss.",
+					"effects": {"food": -10.0, "readiness": -6.0, "morale": -1.0}
 				}
 			]
 		},

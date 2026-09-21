@@ -1,14 +1,16 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/main_menu.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/opening.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/strategy_view.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/event_panel.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/combat_brief.tscn" id="5"]
-[ext_resource type="Script" path="res://ui/campaign_controller.gd" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/new_migration.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/settings_panel.tscn" id="7"]
+[ext_resource type="Script" path="res://ui/campaign_controller.gd" id="8"]
 
 [node name="Main" type="Node"]
-script = ExtResource("6")
+script = ExtResource("8")
 
 [node name="MainMenu" parent="." instance=ExtResource("1")]
 unique_name_in_owner = true
@@ -19,6 +21,7 @@ visible = false
 
 [node name="StrategyView" parent="." instance=ExtResource("3")]
 unique_name_in_owner = true
+visible = false
 
 [node name="EventPanel" parent="." instance=ExtResource("4")]
 unique_name_in_owner = true
@@ -27,3 +30,14 @@ visible = false
 [node name="CombatBrief" parent="." instance=ExtResource("5")]
 unique_name_in_owner = true
 visible = false
+
+[node name="NewMigration" parent="." instance=ExtResource("6")]
+unique_name_in_owner = true
+visible = false
+
+[node name="SettingsPanel" parent="." instance=ExtResource("7")]
+unique_name_in_owner = true
+visible = false
+
+[node name="CombatHolder" type="Node2D" parent="."]
+unique_name_in_owner = true

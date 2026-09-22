@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Run all headless logic tests for THE LAST MIGRATION.
+# Run all headless logic tests for APHELION.
 set -u
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 GODOT="$ROOT/tools/godot/godot"

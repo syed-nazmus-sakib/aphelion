@@ -73,7 +73,7 @@ func _build() -> void:
 	top_left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top_left.add_theme_constant_override("separation", 0)
 	top.add_child(top_left)
-	header_label = ThemeKit.make_label("THE LAST MIGRATION", 24, Color(0.9, 0.95, 1.0))
+	header_label = ThemeKit.make_label("APHELION", 24, Color(0.9, 0.95, 1.0))
 	top_left.add_child(header_label)
 	var date_row := HBoxContainer.new()
 	date_row.add_theme_constant_override("separation", 12)

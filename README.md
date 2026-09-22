@@ -1,4 +1,4 @@
-# THE LAST MIGRATION
+# APHELION
 
 A generational interstellar strategy game: six Arkships carry ~2.7M people on a ~550-year voyage to Eiren IV. Strategy, arkship management, real-time combat, and accumulated history interconnect — combat damage harms civilization, civilization sets combat capacity, decisions persist for centuries.
 

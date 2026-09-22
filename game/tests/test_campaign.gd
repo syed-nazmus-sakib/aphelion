@@ -23,7 +23,7 @@ func _initialize() -> void:
 	var bad_seed: Variant = JSON.parse_string(JSON.stringify(baseline))
 	bad_seed.rng_seed = 42
 	check(CampaignState.from_dict(bad_seed) == null, "rng seed type rejected")
-	var path: String = OS.get_environment("HOME") + "/.local_share/godot/app_userdata/The Last Migration/test_save.json"
+	var path: String = OS.get_environment("HOME") + "/.local_share/godot/app_userdata/Aphelion/test_save.json"
 	check(SaveSystem.save_campaign(state, path) == OK, "atomic save")
 	var loaded := SaveSystem.load_campaign(path)
 	check(loaded != null and loaded.to_dict() == baseline, "save load roundtrip")

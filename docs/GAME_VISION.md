@@ -1,6 +1,6 @@
 # GAME VISION
 
-THE LAST MIGRATION is a single-player generational strategy game about carrying civilization, not winning battles.
+APHELION is a single-player generational strategy game about carrying civilization, not winning battles.
 
 Six Arkships leave a ruined Earth with ~2.7M people toward Eiren IV, ~52 light-years away, ~550 years sailing. Nobody departing arrives. The player is Fleet Command continuity: keeping people alive, fed, healthy, and coherent long enough that descendants might arrive as something still recognizably human.
 

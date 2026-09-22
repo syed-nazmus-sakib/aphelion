@@ -3,6 +3,7 @@ extends RefCounted
 
 const REPAIR_COST_PER_HULL: float = 100.0
 const MAX_REPAIR_HULL: float = 10.0
+const COURSE_PREFIX: String = "course:"
 
 static func apply_combat_result(state: CampaignState, result: CombatResult) -> bool:
 	if state == null or result == null:
@@ -37,4 +38,27 @@ static func repair(state: CampaignState) -> bool:
 	state.resources["materials"] = state.clamp_resource("materials", float(state.resources["materials"]) - cost)
 	state.resources["hull"] = state.clamp_resource("hull", hull + points)
 	state.record_history({"type": "repair", "label": "Hull repaired", "detail": "+%.1f hull for %d materials" % [points, int(cost)]})
+	return true
+
+static func course_node(state: CampaignState) -> String:
+	if state == null:
+		return ""
+	for flag in state.flags:
+		var entry := String(flag)
+		if entry.begins_with(COURSE_PREFIX):
+			return entry.trim_prefix(COURSE_PREFIX)
+	return ""
+
+static func plot_course(state: CampaignState, node_id: String, node_label: String) -> bool:
+	if state == null or node_id.is_empty() or node_label.is_empty():
+		return false
+	if node_label == state.location:
+		return false
+	if course_node(state) == node_id:
+		return false
+	for i in range(state.flags.size() - 1, -1, -1):
+		if String(state.flags[i]).begins_with(COURSE_PREFIX):
+			state.flags.remove_at(i)
+	state.flags.append(COURSE_PREFIX + node_id)
+	state.record_history({"type": "course", "label": "Course plotted", "detail": node_label})
 	return true

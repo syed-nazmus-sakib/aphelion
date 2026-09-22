@@ -22,16 +22,16 @@ Godot 4.7.2 stable, typed GDScript, GL Compatibility, 1280×800, `canvas_items` 
 Pure-logic `MigrationInterceptor` / `MigrationEnemy` (DRONE weaver, RAIDER chaser, STRIKER diver, ELITE 16-HP mini-boss) / `MigrationProjectile` / `MigrationWaves` (4 waves) / `CombatArena` (step, breach, win/lose incl. player-death defeat). Rendering/input/HUD in `CombatView` (Node2D `_draw`: parallax stars, grid, arkship + hull bar, ships, projectiles, explosions/flashes/shake, threat warnings; `_process` input WASD/arrows+Space/mouse+Shift+Esc). Scene: `scenes/combat.tscn`.
 
 ## Strategy (`game/strategy/star_map.gd`, `game/ui/strategy_view.gd`)
-`StarMap` draws Charon (current) / Galene (next) / Hollow (danger) / Thresher (resource). Dashboard shows stats, 7 conceptual districts mapped to resources, objective state machine, recent + full history overlay, Advance/Repair/Save/Menu.
+`StarMap` draws Charon (current) / Galene (next) / Hollow (danger) / Thresher (resource) with radar sweep, click-to-inspect intel (threat/salvage/transit) and course plotting (`FleetSystem.plot_course` → `course:<id>` save flag). Dashboard (`StrategyView`) sits on a `SpaceBackground` starfield and shows the live `ArkshipDiagram`, seven `StatBar` gauges (snap on first paint, ease + flash on change), population counter with delta flash, objective state machine, alert strip, recent log, top-center toasts, and a history overlay. Shared UI kit: `ui/theme_kit.gd` (palette + helpers), project theme `ui/migration_theme.tres` (`gui/theme/custom`), widgets `StatBar` / `SpaceBackground` / `SensorScope` / `menu_convoy.gd`.
 
 ## Flow (`game/ui/campaign_controller.gd`, `game/scenes/main.tscn`)
-Menu → NewMigration (name/seed/difficulty) → Opening (animated) → Strategy ⇄ Event ⇄ CombatBrief → Combat → Aftermath → Strategy; Continue bypasses Opening; Menu saves. All transitions explicit; combat lives under `CombatHolder` and is freed after applying results.
+Menu → NewMigration (name/seed/difficulty) → Opening (animated) → Strategy ⇄ Event ⇄ CombatBrief → Combat → Aftermath → Strategy; Continue bypasses Opening; Menu saves. Transitions cross-fade via a CanvasLayer (instant cuts when headless); controller emits toasts for advance/repair/save/course/choice/combat outcomes. Combat lives under `CombatHolder` and is freed after applying results.
 
 ## Determinism
 Campaign seed stored; `CampaignState` RNG state round-trips through saves. Wave/combat visuals seed from `seed+day`.
 
 ## Testing
-Headless SceneTree scripts: `test_campaign` (roundtrip/schema/negatives/atomic save/RNG), `test_loop` (event→combat→memorial→history), `test_combat` (arena concludes, sane result), `test_menu` (buttons/signals/scenes). Pure logic first; visuals boot-checked via import + scene instantiation.
+Headless SceneTree scripts: `test_campaign` (roundtrip/schema/negatives/atomic save/RNG), `test_loop` (event→combat→memorial→history), `test_combat` (arena concludes, sane result), `test_menu` (buttons/signals/scenes/dialog centering), `test_visual` (theme, widgets, map interaction, plot-course + save roundtrip, toasts, event chips/keyboard). Runner: `tools/scripts/run_tests.sh`. Windowed screenshots: `tests/capture_previews.gd` → `logs/previews/`.
 
 ## Future hooks
 Districts become simulated entities; characters gain aging/succession; events gain conditions/delayed chains; star map gains procedural generation; combat gains classes/capital ships — all without breaking save schema v1 (bump + migrate when fields change).

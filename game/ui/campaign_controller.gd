@@ -1,8 +1,12 @@
 extends Node
 
 var combat_view: CombatView = null
+var fade_layer: CanvasLayer = null
+var fade_rect: ColorRect = null
+var _fading: bool = false
 
 func _ready() -> void:
+	_build_fade()
 	%MainMenu.new_requested.connect(_on_new_requested)
 	%MainMenu.continue_requested.connect(_on_continue_requested)
 	%MainMenu.settings_requested.connect(_on_settings_requested)
@@ -14,10 +18,39 @@ func _ready() -> void:
 	%StrategyView.repair_requested.connect(_on_repair)
 	%StrategyView.save_requested.connect(_on_save)
 	%StrategyView.menu_requested.connect(_on_menu)
+	%StrategyView.course_requested.connect(_on_course)
 	%EventPanel.choice_made.connect(_on_choice)
 	%CombatBrief.launch_requested.connect(_on_launch)
 	%CombatBrief.dismissed.connect(_on_brief_dismissed)
 	_show_menu()
+
+func _build_fade() -> void:
+	fade_layer = CanvasLayer.new()
+	fade_layer.layer = 100
+	add_child(fade_layer)
+	fade_rect = ColorRect.new()
+	fade_rect.color = Color(0.008, 0.014, 0.03)
+	fade_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	fade_rect.mouse_filter = Control.MOUSE_FILTER_STOP
+	fade_rect.modulate.a = 0.0
+	fade_layer.add_child(fade_rect)
+
+func _switch(action: Callable) -> void:
+	# Headless tests skip the visual transition; windows get a cinematic fade.
+	if DisplayServer.get_name() == "headless" or _fading:
+		action.call()
+		return
+	_fading = true
+	fade_rect.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_property(fade_rect, "modulate:a", 1.0, 0.22)
+	tw.tween_callback(action)
+	tw.tween_property(fade_rect, "modulate:a", 0.0, 0.3)
+	tw.tween_callback(func() -> void: _fading = false)
+
+func _toast(text: String, kind: String = "info") -> void:
+	if Campaign.state != null:
+		%StrategyView.show_toast(text, kind)
 
 func _show_menu() -> void:
 	%MainMenu.visible = true
@@ -48,7 +81,8 @@ func _on_new_start(campaign_name: String, seed_value: int, difficulty: int) -> v
 	# replay opening each new migration: reconnect one-shot
 	if not %Opening.opening_finished.is_connected(_on_opening_finished):
 		%Opening.opening_finished.connect(_on_opening_finished, CONNECT_ONE_SHOT)
-	%Opening.play()
+	_switch(func() -> void:
+		%Opening.play())
 
 func _apply_difficulty(difficulty: int) -> void:
 	if Campaign.state == null:
@@ -66,10 +100,12 @@ func _apply_difficulty(difficulty: int) -> void:
 func _on_continue_requested() -> void:
 	if not Campaign.continue_campaign():
 		return
-	%MainMenu.visible = false
-	%Opening.visible = false
-	%StrategyView.visible = true
-	_refresh()
+	_switch(func() -> void:
+		%MainMenu.visible = false
+		%Opening.visible = false
+		%StrategyView.visible = true
+		_refresh()
+		_toast("Migration resumed at %s." % TimeSystem.date_label(Campaign.state.day), "ok"))
 
 func _on_settings_requested() -> void:
 	%SettingsPanel.open()
@@ -78,47 +114,82 @@ func _on_settings_closed() -> void:
 	%SettingsPanel.visible = false
 
 func _on_opening_finished() -> void:
-	%Opening.visible = false
-	%StrategyView.visible = true
-	_refresh()
+	_switch(func() -> void:
+		%Opening.visible = false
+		%StrategyView.visible = true
+		_refresh()
+		_toast("Fleet Command is yours. The migration begins.", "ok"))
 
 # --- strategy flows ---
 
 func _on_advance() -> void:
 	if Campaign.state == null:
 		return
+	var day_before: int = Campaign.state.day
+	var pop_before: int = Campaign.state.population
 	TimeSystem.advance(Campaign.state, 30)
 	SaveManager.save(Campaign.state)
 	_refresh()
+	var days: int = Campaign.state.day - day_before
+	var pop_delta: int = Campaign.state.population - pop_before
+	if Campaign.state.active_event != "":
+		_toast("Advance halted — a decision waits (%d days elapsed)." % maxi(days, 0), "warn")
+	elif days > 0:
+		_toast("Advanced %d days · %s · population %+d" % [days, CampaignDate.from_total_days(Campaign.state.day).short_label(), pop_delta], "info")
 
 func _on_repair() -> void:
 	if Campaign.state == null:
 		return
 	if FleetSystem.repair(Campaign.state):
 		SaveManager.save(Campaign.state)
-	_refresh()
+		_refresh()
+		_toast("Hull crews report: integrity now %.0f%%." % float(Campaign.state.resources.hull), "ok")
+	else:
+		%StrategyView.message_label.text = "Repairs impossible — no materials or no damage to patch."
 
 func _on_save() -> void:
 	if Campaign.state == null:
 		return
 	SaveManager.save(Campaign.state)
 	%StrategyView.message_label.text = "Migration saved. History will remember."
+	_toast("Migration saved.", "ok")
 
 func _on_menu() -> void:
 	if Campaign.state != null:
 		SaveManager.save(Campaign.state)
-	_show_menu()
+	_switch(_show_menu)
+
+func _on_course(node_id: String, node_label: String) -> void:
+	if Campaign.state == null:
+		return
+	if FleetSystem.plot_course(Campaign.state, node_id, node_label):
+		SaveManager.save(Campaign.state)
+		_refresh()
+		_toast("Course plotted: %s." % node_label, "info")
+	else:
+		_toast("Course unchanged — already holding or already plotted there.", "warn")
 
 func _on_choice(event_id: String, index: int) -> void:
 	if Campaign.state == null:
 		return
 	var events := EventSystem.new()
+	var title := ""
+	var chosen_label := ""
+	if events.events.has(event_id):
+		title = String(events.events[event_id].get("title", ""))
+		var choices: Array = events.events[event_id].get("choices", [])
+		if index >= 0 and index < choices.size():
+			chosen_label = String(choices[index].get("label", ""))
 	if not events.choose(Campaign.state, event_id, index):
 		%StrategyView.message_label.text = "Cannot take that action — reserves too low."
 		_refresh()
 		return
 	SaveManager.save(Campaign.state)
 	_refresh()
+	var toast_text := ("%s — %s" % [title, chosen_label]) if chosen_label != "" else "Decision recorded."
+	_toast(toast_text, "warn" if Campaign.state.pending_combat else "info")
+	if Campaign.state.pending_combat:
+		_toast("Hostile contact armed — combat imminent.", "danger")
 
 func _on_brief_dismissed() -> void:
 	%CombatBrief.visible = false
@@ -131,23 +202,29 @@ func _on_launch() -> void:
 	%EventPanel.visible = false
 	%CombatBrief.visible = false
 	%StrategyView.visible = false
-	var scene: PackedScene = load("res://scenes/combat.tscn")
-	combat_view = scene.instantiate() as CombatView
-	%CombatHolder.add_child(combat_view)
-	combat_view.setup(
-		float(Campaign.state.resources.hull),
-		float(Campaign.state.resources.readiness),
-		Campaign.state.seed_value + Campaign.state.day)
-	combat_view.combat_finished.connect(_on_combat_finished, CONNECT_ONE_SHOT)
+	_switch(func() -> void:
+		var scene: PackedScene = load("res://scenes/combat.tscn")
+		combat_view = scene.instantiate() as CombatView
+		%CombatHolder.add_child(combat_view)
+		combat_view.setup(
+			float(Campaign.state.resources.hull),
+			float(Campaign.state.resources.readiness),
+			Campaign.state.seed_value + Campaign.state.day)
+		combat_view.combat_finished.connect(_on_combat_finished, CONNECT_ONE_SHOT))
 
 func _on_combat_finished(result: CombatResult) -> void:
 	if Campaign.state != null and result != null:
 		FleetSystem.apply_combat_result(Campaign.state, result)
 		SaveManager.save(Campaign.state)
 	_clear_combat()
-	%StrategyView.visible = true
-	_refresh()
-	_check_game_over()
+	_switch(func() -> void:
+		%StrategyView.visible = true
+		_refresh()
+		if result != null:
+			var kind := "ok" if result.victory else "danger"
+			var headline := "Victory" if result.victory else "Defeat"
+			_toast("%s — hull -%.1f, casualties %d, salvage %d." % [headline, result.hull_damage, result.casualties, result.salvage], kind)
+		_check_game_over())
 
 func _clear_combat() -> void:
 	if combat_view != null and is_instance_valid(combat_view):
@@ -163,6 +240,7 @@ func _check_game_over() -> void:
 		Campaign.state.record_history({"type": "gameover", "label": "Arkship lost", "detail": "Asteria could no longer sustain life."})
 		SaveManager.save(Campaign.state)
 		%StrategyView.message_label.text = "ASTERIA IS LOST. The migration ends here — start a new journey from the menu."
+		_toast("ASTERIA IS LOST.", "danger")
 
 # --- refresh ---
 
@@ -185,7 +263,7 @@ func _present_event_if_any() -> void:
 		var events := EventSystem.new()
 		if events.events.has(state.active_event):
 			if not %EventPanel.visible:
-				%EventPanel.present(events.events[state.active_event])
+				%EventPanel.present(events.events[state.active_event], state)
 			return
 	# otherwise check for newly due event
 	if not state.pending_combat:
@@ -194,4 +272,4 @@ func _present_event_if_any() -> void:
 		if not due.is_empty():
 			state.active_event = String(due["id"])
 			SaveManager.save(state)
-			%EventPanel.present(due)
+			%EventPanel.present(due, state)

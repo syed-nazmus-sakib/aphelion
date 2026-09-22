@@ -1,6 +1,6 @@
 # ROADMAP
 
-## Done — v0.1.0 first playable (this milestone)
+## Done — v0.1.0 first playable
 - [x] Phase 0: env (macOS arm64, `/Volumes/ns_external`, 521G free, writable), Godot 4.7.2 verified (`4.7.2.stable.official`), Git repo + `.gitignore`.
 - [x] Phase 1: empty game (1280×800, stretch, main menu boots).
 - [x] Phase 2: core architecture (GameState/Time/Resources/History/Events/Saves/seed + headless tests).
@@ -11,7 +11,16 @@
 - [x] Phase 7: first playable (5 events, settings/pause/audio buses, macOS export, tag).
 - Definition of done (22 steps): all verified headless + boot-checked. See DEV_LOG.
 
-## Next — v0.2 The Fleet
+## Done — v0.2 Living Interface (this milestone)
+- [x] Global theme + UI kit (`migration_theme.tres`, `theme_kit.gd`, `StatBar`, `SpaceBackground`, `SensorScope`).
+- [x] Strategy dashboard rebuilt: starfield, alert strip, live arkship diagram, animated gauges, population counter, toasts, fades.
+- [x] Star map: radar sweep, click-to-inspect intel, `PLOT COURSE` (persisted via `FleetSystem.plot_course`).
+- [x] Event panel: effect chips, affordability, keyboard 1–3, state-aware presentation.
+- [x] Menu convoy + typewriter opening with Earth/arkship animation.
+- [x] Visual polish pass: first-paint gauge snap, toast placement, soft nebula, opening backdrop fix, starfield sizing fix.
+- [x] `test_visual` (45 checks) + screenshot harness; 5 suites green (65 PASS).
+
+## Next — v0.2.x The Fleet
 All six arkships, specializations, resource exchange, formation, per-ship dashboards, fleet-level events.
 
 ## Then

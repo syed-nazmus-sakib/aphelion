@@ -5,6 +5,9 @@ signal dismissed
 
 var info_label: Label
 var launch_btn: Button
+var scope: SensorScope = null
+var _t: float = 0.0
+var _tween: Tween = null
 
 func _ready() -> void:
 	visible = false
@@ -12,6 +15,12 @@ func _ready() -> void:
 	launch_btn = $Panel/VBox/Buttons/LaunchButton
 	launch_btn.pressed.connect(func() -> void: launch_requested.emit())
 	$Panel/VBox/Buttons/CloseButton.pressed.connect(func() -> void: dismissed.emit())
+	scope = SensorScope.new()
+	scope.custom_minimum_size = Vector2(260, 130)
+	var vbox := $Panel/VBox
+	vbox.add_child(scope)
+	vbox.move_child(scope, 2)
+	set_process(true)
 
 func present(state: CampaignState) -> void:
 	if state == null or not state.pending_combat:
@@ -28,3 +37,17 @@ func present(state: CampaignState) -> void:
 	info_label.text = "\n".join(lines)
 	launch_btn.visible = true
 	visible = true
+	modulate.a = 0.0
+	if _tween != null and _tween.is_valid():
+		_tween.kill()
+	_tween = create_tween()
+	_tween.tween_property(self, "modulate:a", 1.0, 0.2)
+
+func _process(delta: float) -> void:
+	if not visible:
+		return
+	_t += delta
+	# urgent pulse on the launch button
+	if launch_btn != null and not launch_btn.disabled:
+		var pulse: float = 0.85 + 0.15 * sin(_t * 6.0)
+		launch_btn.modulate = Color(1, pulse, pulse * 0.9)

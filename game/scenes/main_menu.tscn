@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://ui/main_menu.gd" id="1"]
+[ext_resource type="Script" path="res://ui/space_background.gd" id="2"]
 
 [node name="MainMenu" type="Control"]
 anchors_preset = 15
@@ -12,7 +13,13 @@ script = ExtResource("1")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.018, 0.031, 0.06, 1)
+color = Color(0.016, 0.028, 0.055, 1)
+
+[node name="Stars" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("2")
 
 [node name="Panel" type="VBoxContainer" parent="."]
 anchors_preset = 8
@@ -20,20 +27,26 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -180.0
-offset_top = -140.0
-offset_right = 180.0
-offset_bottom = 140.0
-theme_override_constants/separation = 18
+offset_left = -220.0
+offset_top = -180.0
+offset_right = 220.0
+offset_bottom = 180.0
+theme_override_constants/separation = 14
 
 [node name="Title" type="Label" parent="Panel"]
+theme_override_font_sizes/font_size = 40
+theme_override_colors/font_color = Color(0.88, 0.94, 0.98, 1)
 text = "THE LAST MIGRATION"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 34
-theme_override_colors/font_color = Color(0.78, 0.88, 0.93, 1)
+
+[node name="Subtitle" type="Label" parent="Panel"]
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.5, 0.62, 0.72, 1)
+text = "INTERSTELLAR CONTINUITY ARK FLEET · EXODUS COMMAND"
+horizontal_alignment = 1
 
 [node name="Spacer" type="Control" parent="Panel"]
-custom_minimum_size = Vector2(0, 10)
+custom_minimum_size = Vector2(0, 14)
 
 [node name="StartButton" type="Button" parent="Panel"]
 text = "NEW MIGRATION"
@@ -51,4 +64,20 @@ text = "QUIT"
 [node name="StatusLabel" type="Label" parent="Panel"]
 text = ""
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.55, 0.62, 0.68, 1)
+
+[node name="Version" type="Label" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -28.0
+offset_right = -16.0
+offset_bottom = -10.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.4, 0.48, 0.56, 1)
+text = "v0.2 · living interface prototype"
+horizontal_alignment = 2
